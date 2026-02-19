@@ -7,6 +7,8 @@ import { UsersModule } from './modules/users/users.module';
 import { EventsModule } from './modules/events/events.module';
 import { CommunityModule } from './modules/community/community.module';
 import { AffiliatesModule } from './modules/affiliates/affiliates.module';
+import { TranslationsModule } from './modules/translations/translations.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -42,6 +44,8 @@ import configuration from './config/configuration';
     EventsModule,
     CommunityModule,
     AffiliatesModule,
+    TranslationsModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

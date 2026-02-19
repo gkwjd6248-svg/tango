@@ -1,5 +1,7 @@
 import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { EventCard } from '../../src/components/EventCard';
 import { eventsApi } from '../../src/api/events';
 
@@ -15,15 +17,23 @@ interface TangoEvent {
 }
 
 export default function EventsScreen() {
+  const router = useRouter();
+  const { t } = useTranslation();
   const [events, setEvents] = useState<TangoEvent[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const loadEvents = async () => {
     try {
+      setError(null);
       const response = await eventsApi.getEvents();
       setEvents(response.items);
-    } catch (error) {
-      console.error('Failed to load events:', error);
+    } catch (err: any) {
+      setError(err.message || t('error'));
+      console.error('Failed to load events:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -37,20 +47,49 @@ export default function EventsScreen() {
     loadEvents();
   }, []);
 
+  if (isLoading) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.loadingText}>{t('loading')}</Text>
+      </View>
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>{error}</Text>
+        <Text style={styles.retryText} onPress={loadEvents}>
+          {t('retry')}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <FlatList
         data={events}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <EventCard event={item} />}
+        renderItem={({ item }) => (
+          <EventCard
+            event={item}
+            onPress={() => router.push(`/event/${item.id}`)}
+          />
+        )}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={['#E91E63']} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={['#8B0000']}
+            tintColor="#8B0000"
+          />
         }
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Text style={styles.emptyText}>No events found nearby</Text>
-            <Text style={styles.emptySubtext}>Pull down to refresh</Text>
+            <Text style={styles.emptyText}>{t('noEvents')}</Text>
+            <Text style={styles.emptySubtext}>{t('pullToRefresh')}</Text>
           </View>
         }
       />
@@ -61,7 +100,21 @@ export default function EventsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f5f5' },
   list: { padding: 16 },
-  empty: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 100 },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 32,
+  },
+  loadingText: { fontSize: 16, color: '#666' },
+  errorText: { fontSize: 16, color: '#8B0000', marginBottom: 12, textAlign: 'center' },
+  retryText: { fontSize: 15, color: '#8B0000', textDecorationLine: 'underline' },
+  empty: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 100,
+  },
   emptyText: { fontSize: 18, color: '#666', fontWeight: '600' },
   emptySubtext: { fontSize: 14, color: '#999', marginTop: 8 },
 });
