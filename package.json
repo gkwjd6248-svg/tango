@@ -1,0 +1,14 @@
+{
+  "name": "tango-community",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["backend", "mobile", "crawler"],
+  "scripts": {
+    "backend:dev": "npm run dev --workspace=backend",
+    "mobile:dev": "npm run dev --workspace=mobile",
+    "crawler:dev": "npm run dev --workspace=crawler",
+    "crawler:run": "npm run crawl --workspace=crawler",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  }
+}

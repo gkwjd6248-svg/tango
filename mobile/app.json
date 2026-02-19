@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Tango Community",
+    "slug": "tango-community",
+    "version": "1.0.0",
+    "scheme": "tango",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tangocommunity.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E91E63"
+      },
+      "package": "com.tangocommunity.app"
+    },
+    "plugins": ["expo-router", "expo-localization", "expo-secure-store"]
+  }
+}
