@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ────────────────────────────────────────────────
+   Base reset & custom properties
+   ──────────────────────────────────────────────── */
+:root {
+  --color-primary:   #8B0000;
+  --color-accent:    #D4A017;
+  --color-bg:        #FFF8E7;
+  --color-text:      #1A1A1A;
+  --color-muted:     #6B6B5E;
+  --header-height:   64px;
+}
+
+@layer base {
+  html {
+    font-family: 'Inter', 'Noto Sans KR', 'Noto Sans JP', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-warm-50 text-warm-950 antialiased;
+    min-height: 100vh;
+  }
+
+  /* Focus outline for accessibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-700;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  a {
+    @apply transition-colors duration-150;
+  }
+}
+
+@layer components {
+  /* Card base */
+  .card {
+    @apply bg-white rounded-xl shadow-sm border border-warm-100 overflow-hidden;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-2.5 rounded-lg font-medium text-sm
+           bg-primary-700 text-white
+           hover:bg-primary-600 active:bg-primary-800
+           transition-colors duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2
+           px-5 py-2.5 rounded-lg font-medium text-sm
+           border border-primary-700 text-primary-700 bg-transparent
+           hover:bg-primary-50 active:bg-primary-100
+           transition-colors duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           px-4 py-2 rounded-lg font-medium text-sm
+           text-warm-700 hover:bg-warm-100
+           transition-colors duration-150;
+  }
+
+  /* Form inputs */
+  .input-field {
+    @apply w-full px-4 py-2.5 rounded-lg
+           border border-warm-200 bg-white text-warm-950
+           placeholder:text-warm-400
+           focus:outline-none focus:ring-2 focus:ring-primary-700/30 focus:border-primary-700
+           transition-all duration-150;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-red {
+    @apply badge bg-primary-100 text-primary-700;
+  }
+
+  .badge-gold {
+    @apply badge bg-accent-300/20 text-accent-600;
+  }
+
+  /* Page container */
+  .page-container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Section padding */
+  .section-padding {
+    @apply py-8 sm:py-12 lg:py-16;
+  }
+}
+
+@layer utilities {
+  /* Line clamp utilities (supplement Tailwind's) */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Scrollbar styling */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #D4C090 transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #D4C090;
+    border-radius: 3px;
+  }
+}
