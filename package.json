@@ -8,6 +8,10 @@
     "mobile:dev": "npm run dev --workspace=mobile",
     "crawler:dev": "npm run dev --workspace=crawler",
     "crawler:run": "npm run crawl --workspace=crawler",
+    "crawler:local": "npm run local --workspace=crawler",
+    "crawler:local:once": "npm run local:once --workspace=crawler",
+    "crawler:products": "npm run crawl:products --workspace=crawler",
+    "crawler:hotels": "npm run crawl:hotels --workspace=crawler",
     "web:dev": "npm run dev --workspace=web",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"

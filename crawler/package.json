@@ -6,7 +6,11 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "crawl": "tsx src/index.ts"
+    "crawl": "tsx src/index.ts",
+    "local": "tsx src/local-runner.ts",
+    "local:once": "tsx src/local-runner.ts --once",
+    "crawl:products": "tsx src/product-crawler.ts",
+    "crawl:hotels": "tsx src/hotel-enricher.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -17,7 +21,8 @@
     "pino": "^8.17.0",
     "playwright": "^1.41.0",
     "zod": "^3.22.0",
-    "dotenv": "^16.3.1"
+    "dotenv": "^16.3.1",
+    "node-cron": "^3.0.3"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

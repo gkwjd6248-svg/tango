@@ -17,7 +17,7 @@ const logger = pino({ name: 'crawler-main' });
 /**
  * 단일 소스를 크롤링합니다.
  */
-async function crawlSource(source: {
+export async function crawlSource(source: {
   id: string;
   name: string;
   base_url: string;
@@ -124,7 +124,7 @@ async function crawlSource(source: {
 /**
  * 모든 활성 소스를 순차적으로 크롤링합니다.
  */
-async function crawlAll(): Promise<void> {
+export async function crawlAll(): Promise<void> {
   logger.info('=== Starting full crawl cycle ===');
   const startTime = Date.now();
 
@@ -175,4 +175,7 @@ async function main(): Promise<void> {
   }
 }
 
-main();
+// Guard so main() only runs when executed directly, not when imported
+if (require.main === module) {
+  main();
+}

@@ -3,7 +3,7 @@ import 'dotenv/config';
 export const config = {
   database: {
     host: process.env.DATABASE_HOST || 'localhost',
-    port: parseInt(process.env.DATABASE_PORT || '5432', 10),
+    port: parseInt(process.env.DATABASE_PORT || '5433', 10),
     user: process.env.DATABASE_USER || 'postgres',
     password: process.env.DATABASE_PASSWORD || 'postgres',
     database: process.env.DATABASE_NAME || 'tango_community',
@@ -30,5 +30,19 @@ export const config = {
 
   geocoding: {
     apiKey: process.env.GOOGLE_GEOCODING_API_KEY || '',
+  },
+
+  affiliate: {
+    amazon: {
+      associateTag: process.env.AMAZON_ASSOCIATE_TAG || 'tango-community-20',
+      marketplace: process.env.AMAZON_MARKETPLACE || 'US',
+    },
+    coupang: {
+      partnerId: process.env.COUPANG_PARTNER_ID || '',
+      subId: process.env.COUPANG_SUB_ID || 'tango',
+    },
+    aliexpress: {
+      trackingId: process.env.ALIEXPRESS_TRACKING_ID || '',
+    },
   },
 } as const;
