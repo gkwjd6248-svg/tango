@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { Suspense, useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { FaSearch, FaFilter, FaTimes, FaPlus } from 'react-icons/fa';
@@ -32,6 +32,14 @@ const COUNTRY_KEY_MAP: Record<string, string> = {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function EventsPage() {
+  return (
+    <Suspense fallback={<EventGridSkeleton count={9} />}>
+      <EventsContent />
+    </Suspense>
+  );
+}
+
+function EventsContent() {
   const {
     events,
     isLoading,
