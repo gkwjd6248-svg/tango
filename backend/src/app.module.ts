@@ -27,7 +27,8 @@ import configuration from './config/configuration';
         password: config.get('database.password'),
         database: config.get('database.name'),
         autoLoadEntities: true,
-        synchronize: false,
+        synchronize: true,
+        ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
       }),
     }),
     BullModule.forRootAsync({
