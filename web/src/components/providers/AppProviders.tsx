@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useThemeStore } from '@/store/useThemeStore';
 import { detectLocale, useI18nStore } from '@/lib/i18n';
 
 interface AppProvidersProps {
@@ -10,6 +11,7 @@ interface AppProvidersProps {
 
 export function AppProviders({ children }: AppProvidersProps) {
   const loadToken = useAuthStore((s) => s.loadToken);
+  const initTheme = useThemeStore((s) => s.initTheme);
   const setLocale = useI18nStore((s) => s.setLocale);
   const locale = useI18nStore((s) => s.locale);
   const initialized = useRef(false);
@@ -17,6 +19,9 @@ export function AppProviders({ children }: AppProvidersProps) {
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
+
+    // Initialize theme (dark/light/system)
+    initTheme();
 
     // Kick off token validation / user profile fetch
     loadToken();

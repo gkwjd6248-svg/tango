@@ -294,6 +294,90 @@ export const PRODUCT_SOURCES: ProductCrawlSource[] = [
       },
     },
   },
+
+  // ------------------------------------------------------------------
+  // Temu US — tango dance shoes
+  // ------------------------------------------------------------------
+  {
+    id: 'temu-us-tango-shoes',
+    name: 'Temu US — Tango Dance Shoes',
+    base_url: 'https://www.temu.com/search_result.html?search_key=tango+dance+shoes',
+    affiliate_provider: 'temu',
+    product_category: 'shoes',
+    crawl_frequency: 'daily',
+    is_active: true,
+    target_country: 'US',
+    parser_config: {
+      scraper: 'playwright',
+      language: 'en',
+      waitForSelector: '[data-testid="search-result-item"]',
+      selectors: {
+        productList: '[data-testid="search-result-item"]',
+        title: '.goods-title',
+        price: '.price-text',
+        originalPrice: '.origin-price',
+        image: 'img.goods-img',
+        link: 'a',
+      },
+      pagination: { type: 'url_param', param: 'page', maxPages: 2 },
+    },
+  },
+
+  // ------------------------------------------------------------------
+  // Temu US — tango clothing
+  // ------------------------------------------------------------------
+  {
+    id: 'temu-us-tango-clothing',
+    name: 'Temu US — Tango Clothing',
+    base_url: 'https://www.temu.com/search_result.html?search_key=tango+dance+dress',
+    affiliate_provider: 'temu',
+    product_category: 'clothing',
+    crawl_frequency: 'daily',
+    is_active: true,
+    target_country: 'US',
+    parser_config: {
+      scraper: 'playwright',
+      language: 'en',
+      waitForSelector: '[data-testid="search-result-item"]',
+      selectors: {
+        productList: '[data-testid="search-result-item"]',
+        title: '.goods-title',
+        price: '.price-text',
+        originalPrice: '.origin-price',
+        image: 'img.goods-img',
+        link: 'a',
+      },
+      pagination: { type: 'url_param', param: 'page', maxPages: 2 },
+    },
+  },
+
+  // ------------------------------------------------------------------
+  // Temu KR — 탱고 신발
+  // ------------------------------------------------------------------
+  {
+    id: 'temu-kr-tango-shoes',
+    name: 'Temu KR — 탱고 신발',
+    base_url: 'https://www.temu.com/kr/search_result.html?search_key=%ED%83%B1%EA%B3%A0+%EC%8B%A0%EB%B0%9C',
+    affiliate_provider: 'temu',
+    product_category: 'shoes',
+    crawl_frequency: 'daily',
+    is_active: true,
+    target_country: 'KR',
+    parser_config: {
+      scraper: 'playwright',
+      language: 'ko',
+      waitForSelector: '[data-testid="search-result-item"]',
+      selectors: {
+        productList: '[data-testid="search-result-item"]',
+        title: '.goods-title',
+        price: '.price-text',
+        originalPrice: '.origin-price',
+        image: 'img.goods-img',
+        link: 'a',
+      },
+      pagination: { type: 'url_param', param: 'page', maxPages: 2 },
+    },
+  },
 ];
 
 /**

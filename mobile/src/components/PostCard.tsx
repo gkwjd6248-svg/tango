@@ -1,9 +1,21 @@
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+  Modal,
+  FlatList,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CountryFlag } from './CountryFlag';
-import { communityApi } from '../api/community';
+import { communityApi, Comment } from '../api/community';
 import { useCommunityStore } from '../store/useCommunityStore';
+import { useTheme, Theme } from '../theme/useTheme';
 
 interface Props {
   post: {
@@ -34,8 +46,11 @@ function getTimeAgo(date: Date): string {
 export function PostCard({ post }: Props) {
   const { t, i18n } = useTranslation();
   const { updatePostLike, updatePostTranslation } = useCommunityStore();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [likeCount, setLikeCount] = useState(post.likeCount);
+  const [commentCount, setCommentCount] = useState(post.commentCount);
   const [liked, setLiked] = useState(false);
   const [isLiking, setIsLiking] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
@@ -43,6 +58,13 @@ export function PostCard({ post }: Props) {
   const [translatedText, setTranslatedText] = useState<string | null>(
     post.translatedText ?? null,
   );
+
+  // Comments modal state
+  const [showComments, setShowComments] = useState(false);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoadingComments, setIsLoadingComments] = useState(false);
+  const [commentText, setCommentText] = useState('');
+  const [isSendingComment, setIsSendingComment] = useState(false);
 
   const timeAgo = getTimeAgo(new Date(post.createdAt));
 
@@ -54,20 +76,16 @@ export function PostCard({ post }: Props) {
       setLiked(result.liked);
       setLikeCount(result.likeCount);
       updatePostLike(post.id, result.liked, result.likeCount);
-    } catch {
-      // Silent fail — optimistic UI not applied
-    } finally {
+    } catch {} finally {
       setIsLiking(false);
     }
   };
 
   const handleTranslate = async () => {
-    // If we already have a translation, toggle display
     if (translatedText) {
       setShowTranslated((prev) => !prev);
       return;
     }
-
     setIsTranslating(true);
     try {
       const targetLanguage = i18n.language || 'en';
@@ -75,10 +93,33 @@ export function PostCard({ post }: Props) {
       setTranslatedText(result.translatedText);
       setShowTranslated(true);
       updatePostTranslation(post.id, result.translatedText);
-    } catch {
-      // Silent fail
-    } finally {
+    } catch {} finally {
       setIsTranslating(false);
+    }
+  };
+
+  const handleOpenComments = async () => {
+    setShowComments(true);
+    setIsLoadingComments(true);
+    try {
+      const data = await communityApi.getComments(post.id, 1, 50);
+      setComments(data.items);
+    } catch {} finally {
+      setIsLoadingComments(false);
+    }
+  };
+
+  const handleSendComment = async () => {
+    const trimmed = commentText.trim();
+    if (!trimmed || isSendingComment) return;
+    setIsSendingComment(true);
+    try {
+      const newComment = await communityApi.createComment(post.id, trimmed);
+      setComments((prev) => [...prev, newComment]);
+      setCommentText('');
+      setCommentCount((c) => c + 1);
+    } catch {} finally {
+      setIsSendingComment(false);
     }
   };
 
@@ -116,17 +157,21 @@ export function PostCard({ post }: Props) {
           accessibilityLabel={t('like')}
         >
           {isLiking ? (
-            <ActivityIndicator size="small" color="#E91E63" />
+            <ActivityIndicator size="small" color={colors.primaryLight} />
           ) : (
             <Text style={[styles.actionText, liked && styles.actionTextActive]}>
-              {liked ? 'Liked' : t('like')} {likeCount}
+              {liked ? '♥' : '♡'} {likeCount}
             </Text>
           )}
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.actionBtn} accessibilityLabel={t('comment')}>
+        <TouchableOpacity
+          style={styles.actionBtn}
+          onPress={handleOpenComments}
+          accessibilityLabel={t('comment')}
+        >
           <Text style={styles.actionText}>
-            {t('comment')} {post.commentCount}
+            {t('comment')} {commentCount}
           </Text>
         </TouchableOpacity>
 
@@ -137,7 +182,7 @@ export function PostCard({ post }: Props) {
           accessibilityLabel={t('translate')}
         >
           {isTranslating ? (
-            <ActivityIndicator size="small" color="#666" />
+            <ActivityIndicator size="small" color={colors.textSecondary} />
           ) : (
             <Text style={styles.actionText}>
               {showTranslated && translatedText ? t('showOriginal') : t('translate')}
@@ -145,13 +190,84 @@ export function PostCard({ post }: Props) {
           )}
         </TouchableOpacity>
       </View>
+
+      {/* Comments Modal */}
+      <Modal visible={showComments} animationType="slide" transparent>
+        <KeyboardAvoidingView
+          style={styles.modalOverlay}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          <View style={styles.commentsModal}>
+            <View style={styles.commentsHeader}>
+              <Text style={styles.commentsTitle}>{t('comment')} ({commentCount})</Text>
+              <TouchableOpacity onPress={() => setShowComments(false)}>
+                <Text style={styles.closeBtn}>✕</Text>
+              </TouchableOpacity>
+            </View>
+
+            {isLoadingComments ? (
+              <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: 32 }} />
+            ) : (
+              <FlatList
+                data={comments}
+                keyExtractor={(item) => item.id}
+                contentContainerStyle={styles.commentsList}
+                renderItem={({ item }) => (
+                  <View style={styles.commentItem}>
+                    <View style={styles.commentAvatar}>
+                      <Text style={styles.commentAvatarText}>
+                        {item.user.nickname.charAt(0).toUpperCase()}
+                      </Text>
+                    </View>
+                    <View style={styles.commentContent}>
+                      <View style={styles.commentNameRow}>
+                        <Text style={styles.commentName}>{item.user.nickname}</Text>
+                        <CountryFlag countryCode={item.user.countryCode} size={12} />
+                        <Text style={styles.commentTime}>
+                          {getTimeAgo(new Date(item.createdAt))}
+                        </Text>
+                      </View>
+                      <Text style={styles.commentText}>{item.contentText}</Text>
+                    </View>
+                  </View>
+                )}
+                ListEmptyComponent={
+                  <Text style={styles.noComments}>{t('noPosts')}</Text>
+                }
+              />
+            )}
+
+            <View style={styles.commentInputRow}>
+              <TextInput
+                style={styles.commentInput}
+                value={commentText}
+                onChangeText={setCommentText}
+                placeholder={t('writePost')}
+                placeholderTextColor={colors.textTertiary}
+                maxLength={500}
+              />
+              <TouchableOpacity
+                style={[styles.sendCommentBtn, (!commentText.trim() || isSendingComment) && styles.sendCommentBtnDisabled]}
+                onPress={handleSendComment}
+                disabled={!commentText.trim() || isSendingComment}
+              >
+                {isSendingComment ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <Text style={styles.sendCommentText}>{'>'}</Text>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Theme) => StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -166,7 +282,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#8B0000',
+    backgroundColor: c.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
@@ -174,9 +290,9 @@ const styles = StyleSheet.create({
   avatarText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   headerInfo: { flex: 1 },
   nameRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  nickname: { fontSize: 15, fontWeight: '600', color: '#333' },
-  time: { fontSize: 12, color: '#999', marginTop: 2 },
-  content: { fontSize: 15, color: '#333', lineHeight: 22, marginBottom: 4 },
+  nickname: { fontSize: 15, fontWeight: '600', color: c.text },
+  time: { fontSize: 12, color: c.textTertiary, marginTop: 2 },
+  content: { fontSize: 15, color: c.text, lineHeight: 22, marginBottom: 4 },
   translatedLabel: {
     fontSize: 11,
     color: '#DAA520',
@@ -187,11 +303,76 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 16,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: c.border,
     paddingTop: 12,
     marginTop: 8,
   },
   actionBtn: { flexDirection: 'row', alignItems: 'center', minWidth: 60 },
-  actionText: { fontSize: 13, color: '#666' },
-  actionTextActive: { color: '#8B0000', fontWeight: '600' },
+  actionText: { fontSize: 13, color: c.textSecondary },
+  actionTextActive: { color: c.primary, fontWeight: '600' },
+
+  // Comments Modal
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  commentsModal: {
+    backgroundColor: c.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    maxHeight: '80%',
+    minHeight: '50%',
+  },
+  commentsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: c.border,
+  },
+  commentsTitle: { fontSize: 16, fontWeight: '700', color: c.text },
+  closeBtn: { fontSize: 20, color: c.textTertiary, padding: 4 },
+  commentsList: { padding: 16 },
+  commentItem: { flexDirection: 'row', marginBottom: 16 },
+  commentAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: c.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 10,
+  },
+  commentAvatarText: { color: '#fff', fontSize: 13, fontWeight: 'bold' },
+  commentContent: { flex: 1 },
+  commentNameRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 },
+  commentName: { fontSize: 13, fontWeight: '600', color: c.text },
+  commentTime: { fontSize: 11, color: c.textTertiary, marginLeft: 4 },
+  commentText: { fontSize: 14, color: c.textSecondary, lineHeight: 20 },
+  noComments: { textAlign: 'center', color: c.textTertiary, marginTop: 24 },
+  commentInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 8,
+    borderTopWidth: 1,
+    borderTopColor: c.border,
+  },
+  commentInput: {
+    flex: 1,
+    backgroundColor: c.background,
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontSize: 14,
+    color: c.text,
+  },
+  sendCommentBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: c.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  sendCommentBtnDisabled: { opacity: 0.4 },
+  sendCommentText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 });

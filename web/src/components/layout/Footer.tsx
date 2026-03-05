@@ -27,7 +27,7 @@ export function Footer() {
   ];
 
   return (
-    <footer className="bg-warm-950 text-warm-300">
+    <footer className="bg-warm-950 dark:bg-[#0F0D08] text-warm-300 transition-colors">
       <div className="page-container py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
 
@@ -87,7 +87,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-8 pt-6 border-t border-warm-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <div className="mt-8 pt-6 border-t border-warm-800 dark:border-warm-900 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs text-warm-500">
             {t.footer.copyright}
           </p>

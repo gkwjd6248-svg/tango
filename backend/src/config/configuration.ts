@@ -1,7 +1,7 @@
 export default () => ({
   port: parseInt(process.env.PORT || '3000', 10),
   database: {
-    host: process.env.DATABASE_HOST || 'localhost',
+    host: process.env.DATABASE_HOST || '127.0.0.1',
     port: parseInt(process.env.DATABASE_PORT || '5433', 10),
     username: process.env.DATABASE_USER || 'postgres',
     password: process.env.DATABASE_PASSWORD || 'postgres',
@@ -17,6 +17,20 @@ export default () => ({
   },
   anthropic: {
     apiKey: process.env.ANTHROPIC_API_KEY,
+  },
+  google: {
+    clientId: process.env.GOOGLE_CLIENT_ID || '',
+  },
+  kakao: {
+    restApiKey: process.env.KAKAO_REST_API_KEY || '',
+  },
+  naver: {
+    clientId: process.env.NAVER_CLIENT_ID || '',
+    clientSecret: process.env.NAVER_CLIENT_SECRET || '',
+  },
+  apple: {
+    bundleId: process.env.APPLE_BUNDLE_ID || '',
+    serviceId: process.env.APPLE_SERVICE_ID || '',
   },
   aws: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,

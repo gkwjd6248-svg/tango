@@ -24,6 +24,7 @@ export interface PaginatedDeals {
   total: number;
   page: number;
   limit: number;
+  totalPages: number;
 }
 
 @Injectable()
@@ -45,6 +46,7 @@ export class ProductsService {
     category?: string,
     page: number = 1,
     limit: number = 20,
+    targetCountry?: string,
   ): Promise<PaginatedDeals> {
     const now = new Date();
 
@@ -56,6 +58,10 @@ export class ProductsService {
 
     if (category) {
       qb.andWhere('deal.productCategory = :category', { category });
+    }
+
+    if (targetCountry) {
+      qb.andWhere('deal.targetCountry = :targetCountry', { targetCountry });
     }
 
     qb.orderBy('deal.createdAt', 'DESC')
@@ -83,6 +89,7 @@ export class ProductsService {
       total,
       page,
       limit,
+      totalPages: Math.ceil(total / limit),
     };
   }
 }

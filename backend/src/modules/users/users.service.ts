@@ -18,7 +18,11 @@ export class UsersService {
     return this.userRepo.findOne({ where: { id } });
   }
 
-  async create(data: Partial<User> & { passwordHash: string }): Promise<User> {
+  async findByProvider(authProvider: string, authProviderId: string): Promise<User | null> {
+    return this.userRepo.findOne({ where: { authProvider, authProviderId } });
+  }
+
+  async create(data: Partial<User>): Promise<User> {
     const user = this.userRepo.create(data);
     return this.userRepo.save(user);
   }

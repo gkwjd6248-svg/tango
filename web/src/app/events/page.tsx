@@ -1,11 +1,14 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { FaSearch, FaFilter, FaTimes } from 'react-icons/fa';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import { FaSearch, FaFilter, FaTimes, FaPlus } from 'react-icons/fa';
 import { EventCard } from '@/components/EventCard';
 import { EventGridSkeleton } from '@/components/EventCardSkeleton';
 import { useEventsStore } from '@/store/useEventsStore';
-import { countryCodeToFlag } from '@/lib/utils';
+import { useAuthStore } from '@/store/useAuthStore';
+import { useTranslation } from '@/lib/i18n';
 
 // ─── Types & constants ────────────────────────────────────────────────────────
 
@@ -17,29 +20,14 @@ type EventTypeFilter =
   | 'class'
   | 'practica';
 
-const EVENT_TYPE_OPTIONS: { value: EventTypeFilter; label: string }[] = [
-  { value: 'all', label: 'All' },
-  { value: 'milonga', label: 'Milonga' },
-  { value: 'festival', label: 'Festival' },
-  { value: 'workshop', label: 'Workshop' },
-  { value: 'class', label: 'Class' },
-  { value: 'practica', label: 'Practica' },
-];
+// Country codes for building localized options
+const COUNTRY_CODES = ['AR', 'KR', 'JP', 'DE', 'FR', 'IT', 'ES', 'US', 'GB', 'FI'] as const;
 
-// Popular countries — extend as needed
-const COUNTRY_OPTIONS = [
-  { code: '', label: 'All Countries' },
-  { code: 'AR', label: `${countryCodeToFlag('AR')} Argentina` },
-  { code: 'KR', label: `${countryCodeToFlag('KR')} South Korea` },
-  { code: 'JP', label: `${countryCodeToFlag('JP')} Japan` },
-  { code: 'DE', label: `${countryCodeToFlag('DE')} Germany` },
-  { code: 'FR', label: `${countryCodeToFlag('FR')} France` },
-  { code: 'IT', label: `${countryCodeToFlag('IT')} Italy` },
-  { code: 'ES', label: `${countryCodeToFlag('ES')} Spain` },
-  { code: 'US', label: `${countryCodeToFlag('US')} United States` },
-  { code: 'GB', label: `${countryCodeToFlag('GB')} United Kingdom` },
-  { code: 'FI', label: `${countryCodeToFlag('FI')} Finland` },
-];
+const COUNTRY_KEY_MAP: Record<string, string> = {
+  AR: 'countryAR', KR: 'countryKR', JP: 'countryJP', DE: 'countryDE',
+  FR: 'countryFR', IT: 'countryIT', ES: 'countryES', US: 'countryUS',
+  GB: 'countryGB', FI: 'countryFI',
+};
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -55,15 +43,41 @@ export default function EventsPage() {
     fetchEvents,
     loadMore,
   } = useEventsStore();
+  const { isAuthenticated } = useAuthStore();
+  const { t } = useTranslation();
+
+  const eventTypeOptions: { value: EventTypeFilter; label: string }[] = [
+    { value: 'all', label: t.events.all },
+    { value: 'milonga', label: t.events.milonga },
+    { value: 'festival', label: t.events.festival },
+    { value: 'workshop', label: t.events.workshop },
+    { value: 'class', label: t.events.class },
+    { value: 'practica', label: t.events.practica },
+  ];
+
+  const countryOptions = [
+    { code: '', label: t.events.allCountries },
+    ...COUNTRY_CODES.map((code) => ({
+      code,
+      label: (t.events as Record<string, string>)[COUNTRY_KEY_MAP[code]] ?? code,
+    })),
+  ];
+
+  const searchParams = useSearchParams();
+
+  // Read initial country from URL query param (e.g. /events?country=AR)
+  const initialCountry = searchParams.get('country') ?? '';
 
   // Local filter state — applied on search or pill click
   const [cityInput, setCityInput] = useState('');
-  const [countryCode, setCountryCode] = useState('');
+  const [countryCode, setCountryCode] = useState(initialCountry);
   const [eventType, setEventType] = useState<EventTypeFilter>('all');
 
-  // Initial load on mount with no filters
+  // Initial load on mount — apply URL country filter if present
   useEffect(() => {
-    fetchEvents({});
+    fetchEvents({
+      countryCode: initialCountry || undefined,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -129,13 +143,29 @@ export default function EventsPage() {
 
         <div className="page-container relative z-10">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-2">
-            Discover Tango Events
-            <span className="block text-accent-400">Worldwide</span>
+            {t.events.searchTitle}
+            <span className="block text-accent-400">{t.events.searchTitleHighlight}</span>
           </h1>
           <p className="text-primary-200 text-sm sm:text-base mb-8 max-w-lg">
-            Find milongas, festivals, workshops, classes, and practicas near you or
-            anywhere in the world.
+            {t.events.searchSubtitle}
           </p>
+
+          {/* Create event CTA — visible to authenticated users */}
+          {isAuthenticated && (
+            <div className="mb-5">
+              <Link
+                href="/events/create"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg
+                           bg-accent-500 text-warm-950 font-semibold text-sm
+                           hover:bg-accent-400 active:bg-accent-600
+                           transition-colors"
+                aria-label={t.events.createEvent}
+              >
+                <FaPlus size={12} />
+                {t.events.createEvent}
+              </Link>
+            </div>
+          )}
 
           {/* Search controls */}
           <div
@@ -155,7 +185,7 @@ export default function EventsPage() {
                 value={cityInput}
                 onChange={(e) => setCityInput(e.target.value)}
                 onKeyDown={handleCityKeyDown}
-                placeholder="City (e.g. Buenos Aires, Seoul...)"
+                placeholder={t.events.cityPlaceholder}
                 className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20
                            text-white placeholder:text-primary-300
                            focus:outline-none focus:ring-2 focus:ring-accent-400/60
@@ -173,7 +203,7 @@ export default function EventsPage() {
                          focus:border-accent-400 transition-all cursor-pointer"
               aria-label="Filter by country"
             >
-              {COUNTRY_OPTIONS.map(({ code, label }) => (
+              {countryOptions.map(({ code, label }) => (
                 <option key={code} value={code} className="bg-primary-800 text-white">
                   {label}
                 </option>
@@ -190,21 +220,21 @@ export default function EventsPage() {
               aria-label="Apply search filters"
             >
               <FaFilter size={13} />
-              Search
+              {t.events.search}
             </button>
           </div>
         </div>
       </section>
 
       {/* ── Type Filter Pills ─────────────────────────────────────── */}
-      <div className="sticky top-16 z-30 bg-white border-b border-warm-100 shadow-sm">
+      <div className="sticky top-16 z-30 bg-white dark:bg-warm-900 border-b border-warm-100 dark:border-warm-800 shadow-sm">
         <div className="page-container py-3">
           <div
             className="flex items-center gap-2 overflow-x-auto scrollbar-thin pb-0.5"
             role="group"
             aria-label="Filter by event type"
           >
-            {EVENT_TYPE_OPTIONS.map(({ value, label }) => (
+            {eventTypeOptions.map(({ value, label }) => (
               <button
                 key={value}
                 onClick={() => handleEventTypeChange(value)}
@@ -214,7 +244,7 @@ export default function EventsPage() {
                             ${
                               eventType === value
                                 ? 'bg-primary-700 text-white border-primary-700'
-                                : 'bg-white text-warm-700 border-warm-200 hover:border-primary-700 hover:text-primary-700'
+                                : 'bg-white dark:bg-warm-800 text-warm-700 dark:text-warm-300 border-warm-200 dark:border-warm-700 hover:border-primary-700 hover:text-primary-700'
                             }`}
               >
                 {label}
@@ -226,12 +256,12 @@ export default function EventsPage() {
               <button
                 onClick={clearFilters}
                 className="flex-shrink-0 flex items-center gap-1 px-3 py-1.5 rounded-full
-                           text-sm font-medium border border-warm-200 text-warm-500
-                           hover:border-red-300 hover:text-red-600 transition-all ml-2"
+                           text-sm font-medium border border-warm-200 dark:border-warm-700 text-warm-500 dark:text-warm-400
+                           hover:border-red-300 hover:text-red-600 dark:hover:text-red-400 transition-all ml-2"
                 aria-label="Clear all filters"
               >
                 <FaTimes size={10} />
-                Clear
+                {t.events.clearFilters}
               </button>
             )}
           </div>
@@ -242,10 +272,10 @@ export default function EventsPage() {
       <section className="page-container py-8" aria-live="polite" aria-label="Events">
         {/* Result meta */}
         {!isLoading && !error && (
-          <p className="text-sm text-warm-500 mb-5">
+          <p className="text-sm text-warm-500 dark:text-warm-400 mb-5">
             {total === 0
-              ? 'No events found'
-              : `Showing ${events.length} of ${total} event${total !== 1 ? 's' : ''}`}
+              ? t.events.noEventsFound
+              : t.events.showingResults.replace('{{n}}', String(events.length)).replace('{{total}}', String(total))}
           </p>
         )}
 
@@ -256,11 +286,11 @@ export default function EventsPage() {
         {!isLoading && error && (
           <div className="text-center py-20">
             <p className="text-primary-700 font-semibold text-lg mb-2">
-              Failed to load events
+              {t.events.failedToLoad}
             </p>
-            <p className="text-warm-400 text-sm mb-6">{error}</p>
+            <p className="text-warm-400 dark:text-warm-500 text-sm mb-6">{error}</p>
             <button onClick={() => fetchEvents({})} className="btn-primary">
-              Try again
+              {t.common.retry}
             </button>
           </div>
         )}
@@ -269,18 +299,18 @@ export default function EventsPage() {
         {!isLoading && !error && events.length === 0 && (
           <div className="flex flex-col items-center py-24 text-center">
             <div
-              className="w-20 h-20 rounded-full bg-primary-50 flex items-center justify-center mb-5"
+              className="w-20 h-20 rounded-full bg-primary-50 dark:bg-primary-900/30 flex items-center justify-center mb-5"
               aria-hidden="true"
             >
               <span className="text-4xl select-none">💃</span>
             </div>
-            <h2 className="text-warm-700 font-semibold text-xl mb-2">No events found</h2>
-            <p className="text-warm-400 text-sm max-w-xs">
-              Try adjusting your search or filters, or check back later for upcoming events.
+            <h2 className="text-warm-700 dark:text-warm-300 font-semibold text-xl mb-2">{t.events.noEventsFound}</h2>
+            <p className="text-warm-400 dark:text-warm-500 text-sm max-w-xs">
+              {t.events.tryAdjusting}
             </p>
             {hasActiveFilters && (
               <button onClick={clearFilters} className="btn-secondary mt-5">
-                Clear filters
+                {t.events.clearFilters}
               </button>
             )}
           </div>
@@ -326,10 +356,10 @@ export default function EventsPage() {
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
                     />
                   </svg>
-                  Loading...
+                  {t.common.loading}
                 </span>
               ) : (
-                'Load more events'
+                t.events.loadMoreEvents
               )}
             </button>
           </div>

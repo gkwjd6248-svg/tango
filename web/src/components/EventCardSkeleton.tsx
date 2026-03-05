@@ -4,24 +4,24 @@
  */
 export function EventCardSkeleton() {
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 animate-pulse">
+    <div className="bg-white dark:bg-warm-900 rounded-xl overflow-hidden shadow-sm border border-warm-100 dark:border-warm-800 animate-pulse">
       {/* Image placeholder */}
-      <div className="w-full h-44 bg-gray-200" />
+      <div className="w-full h-44 bg-warm-200 dark:bg-warm-700" />
 
       {/* Body */}
       <div className="p-4 space-y-2.5">
         {/* Title lines */}
-        <div className="h-4 bg-gray-200 rounded w-4/5" />
-        <div className="h-4 bg-gray-200 rounded w-2/3" />
+        <div className="h-4 bg-warm-200 dark:bg-warm-700 rounded w-4/5" />
+        <div className="h-4 bg-warm-200 dark:bg-warm-700 rounded w-2/3" />
 
         {/* Venue */}
-        <div className="h-3 bg-gray-100 rounded w-1/2 mt-1" />
+        <div className="h-3 bg-warm-100 dark:bg-warm-800 rounded w-1/2 mt-1" />
 
         {/* City */}
-        <div className="h-3 bg-gray-100 rounded w-1/3" />
+        <div className="h-3 bg-warm-100 dark:bg-warm-800 rounded w-1/3" />
 
         {/* Date */}
-        <div className="h-3 bg-gray-100 rounded w-2/5 mt-2" />
+        <div className="h-3 bg-warm-100 dark:bg-warm-800 rounded w-2/5 mt-2" />
       </div>
     </div>
   );

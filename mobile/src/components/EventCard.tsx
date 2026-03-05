@@ -1,5 +1,7 @@
+import { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { CountryFlag } from './CountryFlag';
+import { useTheme, Theme } from '../theme/useTheme';
 
 interface Props {
   event: {
@@ -24,8 +26,11 @@ const eventTypeColors: Record<string, string> = {
 };
 
 export function EventCard({ event, onPress }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   const date = new Date(event.startDatetime);
-  const typeColor = eventTypeColors[event.eventType] || '#666';
+  const typeColor = eventTypeColors[event.eventType] || colors.textSecondary;
 
   return (
     <TouchableOpacity
@@ -56,9 +61,9 @@ export function EventCard({ event, onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (c: Theme) => StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: c.surface,
     borderRadius: 12,
     marginBottom: 12,
     overflow: 'hidden',
@@ -82,8 +87,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textTransform: 'uppercase',
   },
-  title: { fontSize: 16, fontWeight: 'bold', color: '#333', marginBottom: 4 },
-  venue: { fontSize: 14, color: '#666' },
-  location: { fontSize: 13, color: '#999', marginTop: 2 },
-  date: { fontSize: 13, color: '#8B0000', marginTop: 6, fontWeight: '500' },
+  title: { fontSize: 16, fontWeight: 'bold', color: c.text, marginBottom: 4 },
+  venue: { fontSize: 14, color: c.textSecondary },
+  location: { fontSize: 13, color: c.textTertiary, marginTop: 2 },
+  date: { fontSize: 13, color: c.primary, marginTop: 6, fontWeight: '500' },
 });

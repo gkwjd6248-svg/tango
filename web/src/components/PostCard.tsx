@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { FaHeart, FaRegHeart, FaComment, FaGlobe } from 'react-icons/fa';
 import { communityApi, Post } from '@/lib/api/community';
-import { countryCodeToFlag, formatRelativeTime, getInitials } from '@/lib/utils';
+import { formatRelativeTime, getInitials } from '@/lib/utils';
+import { CountryFlag } from '@/components/CountryFlag';
 import { useCommunityStore } from '@/store/useCommunityStore';
 
 interface PostCardProps {
@@ -12,10 +13,10 @@ interface PostCardProps {
 }
 
 const POST_TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  general: { label: 'General', color: 'text-gray-500 bg-gray-100' },
-  question: { label: 'Question', color: 'text-blue-700 bg-blue-50' },
-  event_share: { label: 'Event', color: 'text-[#8B0000] bg-red-50' },
-  video: { label: 'Video', color: 'text-purple-700 bg-purple-50' },
+  general: { label: 'General', color: 'text-warm-500 dark:text-warm-400 bg-warm-100 dark:bg-warm-800' },
+  question: { label: 'Question', color: 'text-blue-700 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30' },
+  event_share: { label: 'Event', color: 'text-primary-700 dark:text-primary-400 bg-red-50 dark:bg-primary-900/30' },
+  video: { label: 'Video', color: 'text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/30' },
 };
 
 export function PostCard({ post, onUpdated: _onUpdated }: PostCardProps) {
@@ -31,7 +32,7 @@ export function PostCard({ post, onUpdated: _onUpdated }: PostCardProps) {
     post.translatedText ?? null,
   );
 
-  const flag = countryCodeToFlag(post.user.countryCode);
+  const hasCountry = !!post.user.countryCode;
   const initials = getInitials(post.user.nickname);
   const timeAgo = formatRelativeTime(post.createdAt);
   const postTypeInfo = POST_TYPE_LABELS[post.postType] ?? POST_TYPE_LABELS.general;
@@ -78,12 +79,12 @@ export function PostCard({ post, onUpdated: _onUpdated }: PostCardProps) {
   };
 
   return (
-    <article className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-4">
+    <article className="bg-white dark:bg-warm-900 rounded-xl border border-warm-100 dark:border-warm-800 shadow-sm p-5 mb-4">
       {/* Header row */}
       <div className="flex items-center gap-3 mb-4">
         {/* Avatar */}
         <div
-          className="w-10 h-10 rounded-full bg-[#8B0000] flex items-center justify-center
+          className="w-10 h-10 rounded-full bg-primary-700 flex items-center justify-center
                      flex-shrink-0 select-none"
           aria-hidden="true"
         >
@@ -93,13 +94,11 @@ export function PostCard({ post, onUpdated: _onUpdated }: PostCardProps) {
         {/* Name and meta */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="font-semibold text-[#1A1A1A] text-sm leading-tight truncate">
+            <span className="font-semibold text-warm-950 dark:text-warm-100 text-sm leading-tight truncate">
               {post.user.nickname}
             </span>
-            {flag && (
-              <span className="text-base leading-none" aria-label={post.user.countryCode}>
-                {flag}
-              </span>
+            {hasCountry && (
+              <CountryFlag code={post.user.countryCode} size={16} />
             )}
             <span
               className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${postTypeInfo.color}`}
@@ -107,7 +106,7 @@ export function PostCard({ post, onUpdated: _onUpdated }: PostCardProps) {
               {postTypeInfo.label}
             </span>
           </div>
-          <time className="text-xs text-gray-400" dateTime={post.createdAt}>
+          <time className="text-xs text-warm-400 dark:text-warm-500" dateTime={post.createdAt}>
             {timeAgo}
           </time>
         </div>
@@ -115,17 +114,17 @@ export function PostCard({ post, onUpdated: _onUpdated }: PostCardProps) {
 
       {/* Post content */}
       <div className="mb-3">
-        <p className="text-[#1A1A1A] text-sm leading-relaxed whitespace-pre-wrap break-words">
+        <p className="text-warm-950 dark:text-warm-100 text-sm leading-relaxed whitespace-pre-wrap break-words">
           {displayText}
         </p>
 
         {showTranslated && translatedText && (
-          <p className="text-[10px] text-[#D4A017] italic mt-1">Translated text</p>
+          <p className="text-[10px] text-accent-500 dark:text-accent-400 italic mt-1">Translated text</p>
         )}
       </div>
 
       {/* Divider */}
-      <div className="border-t border-gray-100 pt-3">
+      <div className="border-t border-warm-100 dark:border-warm-800 pt-3">
         <div className="flex items-center gap-4">
           {/* Like button */}
           <button
@@ -133,11 +132,11 @@ export function PostCard({ post, onUpdated: _onUpdated }: PostCardProps) {
             disabled={isLiking}
             aria-label={liked ? 'Unlike post' : 'Like post'}
             className={`flex items-center gap-1.5 text-sm transition-colors
-                        ${liked ? 'text-[#8B0000]' : 'text-gray-500 hover:text-[#8B0000]'}
+                        ${liked ? 'text-primary-700 dark:text-primary-400' : 'text-warm-500 dark:text-warm-400 hover:text-primary-700 dark:hover:text-primary-400'}
                         disabled:opacity-50 disabled:cursor-not-allowed`}
           >
             {liked ? (
-              <FaHeart className="text-[#8B0000]" size={14} />
+              <FaHeart className="text-primary-700 dark:text-primary-400" size={14} />
             ) : (
               <FaRegHeart size={14} />
             )}
@@ -146,7 +145,7 @@ export function PostCard({ post, onUpdated: _onUpdated }: PostCardProps) {
 
           {/* Comment count (display only) */}
           <div
-            className="flex items-center gap-1.5 text-sm text-gray-500"
+            className="flex items-center gap-1.5 text-sm text-warm-500 dark:text-warm-400"
             aria-label={`${post.commentCount} comments`}
           >
             <FaComment size={13} />
@@ -158,7 +157,7 @@ export function PostCard({ post, onUpdated: _onUpdated }: PostCardProps) {
             onClick={handleTranslate}
             disabled={isTranslating}
             aria-label={showTranslated ? 'Show original text' : 'Translate post'}
-            className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#8B0000]
+            className="flex items-center gap-1.5 text-sm text-warm-500 dark:text-warm-400 hover:text-primary-700 dark:hover:text-primary-400
                        transition-colors ml-auto disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FaGlobe size={13} />

@@ -9,6 +9,7 @@ interface DealsState {
   isLoadingMore: boolean;
   error: string | null;
   selectedCategory: string;
+  selectedCountry: string; // 'all' | 'US' | 'KR'
   page: number;
   totalPages: number;
   hasMore: boolean;
@@ -16,6 +17,7 @@ interface DealsState {
   fetchDeals: () => Promise<void>;
   loadMore: () => Promise<void>;
   setCategory: (category: string) => void;
+  setCountry: (country: string) => void;
 }
 
 const PAGE_LIMIT = 20;
@@ -26,6 +28,7 @@ export const useDealsStore = create<DealsState>((set, get) => ({
   isLoadingMore: false,
   error: null,
   selectedCategory: 'all',
+  selectedCountry: 'all',
   page: 1,
   totalPages: 1,
   hasMore: true,
@@ -33,9 +36,10 @@ export const useDealsStore = create<DealsState>((set, get) => ({
   fetchDeals: async () => {
     set({ isLoading: true, error: null, page: 1 });
     try {
-      const { selectedCategory } = get();
+      const { selectedCategory, selectedCountry } = get();
       const response = await dealsApi.getDeals({
         category: selectedCategory === 'all' ? undefined : selectedCategory,
+        country: selectedCountry === 'all' ? undefined : selectedCountry,
         page: 1,
         limit: PAGE_LIMIT,
       });
@@ -53,7 +57,7 @@ export const useDealsStore = create<DealsState>((set, get) => ({
   },
 
   loadMore: async () => {
-    const { isLoading, isLoadingMore, hasMore, page, deals, selectedCategory } = get();
+    const { isLoading, isLoadingMore, hasMore, page, deals, selectedCategory, selectedCountry } = get();
     if (isLoading || isLoadingMore || !hasMore) return;
 
     const nextPage = page + 1;
@@ -61,6 +65,7 @@ export const useDealsStore = create<DealsState>((set, get) => ({
     try {
       const response = await dealsApi.getDeals({
         category: selectedCategory === 'all' ? undefined : selectedCategory,
+        country: selectedCountry === 'all' ? undefined : selectedCountry,
         page: nextPage,
         limit: PAGE_LIMIT,
       });
@@ -77,6 +82,11 @@ export const useDealsStore = create<DealsState>((set, get) => ({
 
   setCategory: (category: string) => {
     set({ selectedCategory: category });
+    get().fetchDeals();
+  },
+
+  setCountry: (country: string) => {
+    set({ selectedCountry: country });
     get().fetchDeals();
   },
 }));

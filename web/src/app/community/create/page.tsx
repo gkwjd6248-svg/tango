@@ -111,25 +111,25 @@ function CreatePostForm() {
         <div className="flex items-center gap-3 mb-8">
           <Link
             href="/community"
-            className="flex items-center gap-2 text-warm-500 hover:text-warm-800
+            className="flex items-center gap-2 text-warm-500 dark:text-warm-400 hover:text-warm-800 dark:hover:text-warm-200
                        text-sm transition-colors"
             aria-label="Back to community"
           >
             <FaArrowLeft size={12} />
             Community
           </Link>
-          <span className="text-warm-300" aria-hidden="true">
+          <span className="text-warm-300 dark:text-warm-600" aria-hidden="true">
             /
           </span>
-          <h1 className="text-lg font-bold text-warm-950">Write a Post</h1>
+          <h1 className="text-lg font-bold text-warm-950 dark:text-warm-100">Write a Post</h1>
         </div>
 
         <form onSubmit={handleSubmit} noValidate>
           {/* ── Content area ──────────────────────────────────── */}
-          <section className="bg-white rounded-xl border border-warm-100 p-5 mb-4">
+          <section className="bg-white dark:bg-warm-900 rounded-xl border border-warm-100 dark:border-warm-800 p-5 mb-4">
             <label
               htmlFor="post-content"
-              className="block text-xs font-bold text-primary-700 uppercase tracking-wider mb-3"
+              className="block text-xs font-bold text-primary-700 dark:text-primary-400 uppercase tracking-wider mb-3"
             >
               Your Post
             </label>
@@ -141,12 +141,13 @@ function CreatePostForm() {
               placeholder="What's on your mind? Share news, ask a question, or talk tango..."
               rows={8}
               className={`w-full resize-none rounded-lg border px-4 py-3 text-sm
-                         text-warm-900 placeholder:text-warm-300 leading-relaxed
+                         text-warm-900 dark:text-warm-100 placeholder:text-warm-300 dark:placeholder:text-warm-600 leading-relaxed
+                         bg-white dark:bg-warm-900
                          focus:outline-none focus:ring-2 transition-all
                          ${
                            isOverLimit
                              ? 'border-red-400 focus:ring-red-200 focus:border-red-400'
-                             : 'border-warm-200 focus:ring-primary-700/20 focus:border-primary-700'
+                             : 'border-warm-200 dark:border-warm-700 focus:ring-primary-700/20 focus:border-primary-700'
                          }`}
               maxLength={MAX_CHARS + 50} // soft over-limit allowed to show warning
               aria-required="true"
@@ -173,9 +174,9 @@ function CreatePostForm() {
           </section>
 
           {/* ── Post type selector ───────────────────────────── */}
-          <section className="bg-white rounded-xl border border-warm-100 p-5 mb-4">
+          <section className="bg-white dark:bg-warm-900 rounded-xl border border-warm-100 dark:border-warm-800 p-5 mb-4">
             <fieldset>
-              <legend className="text-xs font-bold text-primary-700 uppercase tracking-wider mb-3">
+              <legend className="text-xs font-bold text-primary-700 dark:text-primary-400 uppercase tracking-wider mb-3">
                 Post Type
               </legend>
 
@@ -187,8 +188,8 @@ function CreatePostForm() {
                                 transition-all
                                 ${
                                   postType === value
-                                    ? 'border-primary-700 bg-primary-50'
-                                    : 'border-warm-200 hover:border-warm-400'
+                                    ? 'border-primary-700 bg-primary-50 dark:bg-primary-900/30'
+                                    : 'border-warm-200 dark:border-warm-700 hover:border-warm-400 dark:hover:border-warm-500'
                                 }`}
                   >
                     <input
@@ -202,7 +203,7 @@ function CreatePostForm() {
                     <div>
                       <span
                         className={`block text-sm font-semibold ${
-                          postType === value ? 'text-primary-700' : 'text-warm-800'
+                          postType === value ? 'text-primary-700 dark:text-primary-400' : 'text-warm-800 dark:text-warm-200'
                         }`}
                       >
                         {label}
@@ -216,9 +217,9 @@ function CreatePostForm() {
           </section>
 
           {/* ── Country scope selector ───────────────────────── */}
-          <section className="bg-white rounded-xl border border-warm-100 p-5 mb-6">
+          <section className="bg-white dark:bg-warm-900 rounded-xl border border-warm-100 dark:border-warm-800 p-5 mb-6">
             <fieldset>
-              <legend className="text-xs font-bold text-primary-700 uppercase tracking-wider mb-3">
+              <legend className="text-xs font-bold text-primary-700 dark:text-primary-400 uppercase tracking-wider mb-3">
                 Audience
               </legend>
 
@@ -230,8 +231,8 @@ function CreatePostForm() {
                                 transition-all
                                 ${
                                   scope === value
-                                    ? 'border-primary-700 bg-primary-50'
-                                    : 'border-warm-200 hover:border-warm-400'
+                                    ? 'border-primary-700 bg-primary-50 dark:bg-primary-900/30'
+                                    : 'border-warm-200 dark:border-warm-700 hover:border-warm-400 dark:hover:border-warm-500'
                                 }
                                 ${
                                   value === 'my_country' && !user?.countryCode
@@ -250,7 +251,7 @@ function CreatePostForm() {
                     />
                     <span
                       className={`text-sm ${
-                        scope === value ? 'text-primary-700 font-semibold' : 'text-warm-700'
+                        scope === value ? 'text-primary-700 dark:text-primary-400 font-semibold' : 'text-warm-700 dark:text-warm-300'
                       }`}
                     >
                       {label}
@@ -274,8 +275,8 @@ function CreatePostForm() {
           {error && (
             <p
               role="alert"
-              className="mb-4 px-4 py-3 rounded-lg bg-red-50 border border-red-200
-                         text-red-700 text-sm"
+              className="mb-4 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800
+                         text-red-700 dark:text-red-300 text-sm"
             >
               {error}
             </p>
@@ -283,7 +284,7 @@ function CreatePostForm() {
 
           {/* Over-limit warning */}
           {isOverLimit && (
-            <p role="alert" className="mb-4 text-red-600 text-sm font-medium">
+            <p role="alert" className="mb-4 text-red-600 dark:text-red-400 text-sm font-medium">
               Your post is {charCount - MAX_CHARS} character{charCount - MAX_CHARS !== 1 ? 's' : ''}{' '}
               over the {MAX_CHARS.toLocaleString()} character limit.
             </p>

@@ -19,7 +19,7 @@ import { formatRelativeTime } from '@/lib/utils';
 function NotificationIcon({ type }: { type: string }) {
   switch (type) {
     case 'new_event':
-      return <FaCalendarAlt className="text-primary-600" size={16} />;
+      return <FaCalendarAlt className="text-primary-600 dark:text-primary-400" size={16} />;
     case 'new_like':
       return <FaHeart className="text-red-500" size={16} />;
     case 'new_comment':
@@ -46,14 +46,17 @@ function NotificationItem({
     <button
       onClick={handleClick}
       className={`w-full text-left flex items-start gap-4 px-5 py-4 transition-colors
-        hover:bg-warm-50 border-b border-warm-100 last:border-b-0
-        ${notification.isRead ? '' : 'bg-blue-50/40'}`}
+        hover:bg-warm-50 dark:hover:bg-warm-800 border-b border-warm-100 dark:border-warm-800 last:border-b-0
+        ${notification.isRead ? '' : 'bg-blue-50/40 dark:bg-blue-900/10'}`}
       aria-label={notification.isRead ? notification.title : `Unread: ${notification.title}`}
     >
       {/* Icon container */}
       <div
         className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center
-          ${notification.isRead ? 'bg-warm-100' : 'bg-white shadow-sm border border-warm-100'}`}
+          ${notification.isRead
+            ? 'bg-warm-100 dark:bg-warm-800'
+            : 'bg-white dark:bg-warm-900 shadow-sm border border-warm-100 dark:border-warm-700'
+          }`}
       >
         <NotificationIcon type={notification.type} />
       </div>
@@ -62,7 +65,9 @@ function NotificationItem({
       <div className="flex-1 min-w-0">
         <p
           className={`text-sm leading-snug ${
-            notification.isRead ? 'text-warm-600 font-normal' : 'text-warm-950 font-semibold'
+            notification.isRead
+              ? 'text-warm-600 dark:text-warm-400 font-normal'
+              : 'text-warm-950 dark:text-warm-100 font-semibold'
           }`}
         >
           {notification.title}
@@ -89,12 +94,12 @@ function NotificationItem({
 // Skeleton loader
 function NotificationSkeleton() {
   return (
-    <div className="flex items-start gap-4 px-5 py-4 animate-pulse border-b border-warm-100">
-      <div className="w-10 h-10 rounded-full bg-warm-100 shrink-0" />
+    <div className="flex items-start gap-4 px-5 py-4 animate-pulse border-b border-warm-100 dark:border-warm-800">
+      <div className="w-10 h-10 rounded-full bg-warm-100 dark:bg-warm-800 shrink-0" />
       <div className="flex-1 space-y-2">
-        <div className="h-3 bg-warm-100 rounded w-3/4" />
-        <div className="h-2 bg-warm-100 rounded w-1/2" />
-        <div className="h-2 bg-warm-100 rounded w-1/4" />
+        <div className="h-3 bg-warm-100 dark:bg-warm-800 rounded w-3/4" />
+        <div className="h-2 bg-warm-100 dark:bg-warm-800 rounded w-1/2" />
+        <div className="h-2 bg-warm-100 dark:bg-warm-800 rounded w-1/4" />
       </div>
     </div>
   );
@@ -179,25 +184,25 @@ function NotificationsContent() {
   };
 
   return (
-    <main className="min-h-screen bg-warm-50">
+    <main className="min-h-screen bg-warm-50 dark:bg-[#1A1410]">
       {/* Page header */}
-      <div className="bg-white border-b border-warm-100 sticky top-0 z-20">
+      <div className="bg-white dark:bg-warm-900 border-b border-warm-100 dark:border-warm-800 sticky top-0 z-20">
         <div className="page-container py-4 flex items-center gap-3">
           <Link
             href="/profile"
-            className="p-2 rounded-lg text-warm-500 hover:text-warm-950 hover:bg-warm-100 transition-colors"
+            className="p-2 rounded-lg text-warm-500 hover:text-warm-950 dark:hover:text-warm-100 hover:bg-warm-100 dark:hover:bg-warm-800 transition-colors"
             aria-label="Back to profile"
           >
             <FaArrowLeft size={16} />
           </Link>
 
-          <h1 className="text-lg font-bold text-warm-950 flex-1">Notifications</h1>
+          <h1 className="text-lg font-bold text-warm-950 dark:text-warm-100 flex-1">Notifications</h1>
 
           {unreadCount > 0 && (
             <button
               onClick={handleMarkAllRead}
               disabled={isMarkingAll}
-              className="btn-ghost text-xs gap-1.5 text-warm-500 disabled:opacity-50"
+              className="btn-ghost text-xs gap-1.5 text-warm-500 dark:text-warm-400 disabled:opacity-50"
               aria-label="Mark all notifications as read"
             >
               <FaCheckDouble size={13} />
@@ -210,7 +215,7 @@ function NotificationsContent() {
       <div className="page-container py-6 max-w-2xl">
         {/* Initial loading */}
         {isLoading && (
-          <div className="card divide-y divide-warm-100">
+          <div className="card divide-y divide-warm-100 dark:divide-warm-800">
             {Array.from({ length: 8 }).map((_, i) => (
               <NotificationSkeleton key={i} />
             ))}
@@ -220,7 +225,7 @@ function NotificationsContent() {
         {/* Error */}
         {error && notifications.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <p className="text-primary-700 font-semibold text-lg mb-4">{error}</p>
+            <p className="text-primary-700 dark:text-primary-400 font-semibold text-lg mb-4">{error}</p>
             <button onClick={() => loadNotifications(true)} className="btn-primary">
               Retry
             </button>
@@ -230,8 +235,8 @@ function NotificationsContent() {
         {/* Empty state */}
         {!isLoading && !error && notifications.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <FaBell size={48} className="text-warm-200 mb-4" />
-            <p className="text-warm-600 font-semibold text-lg">No notifications</p>
+            <FaBell size={48} className="text-warm-200 dark:text-warm-700 mb-4" />
+            <p className="text-warm-600 dark:text-warm-400 font-semibold text-lg">No notifications</p>
             <p className="text-warm-400 text-sm mt-2">
               You&apos;re all caught up! Check back later.
             </p>

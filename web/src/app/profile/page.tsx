@@ -10,17 +10,20 @@ import {
   FaSignOutAlt,
   FaChevronRight,
   FaUser,
+  FaCalendarAlt,
+  FaClipboardList,
 } from 'react-icons/fa';
 import { useAuthStore } from '@/store/useAuthStore';
-import { countryCodeToFlag, getInitials } from '@/lib/utils';
+import { getInitials } from '@/lib/utils';
+import { CountryFlag } from '@/components/CountryFlag';
 
 const DANCE_LEVEL_COLORS: Record<string, string> = {
-  beginner: 'bg-green-100 text-green-700 border-green-300',
-  intermediate: 'bg-blue-100 text-blue-700 border-blue-300',
-  advanced: 'bg-purple-100 text-purple-700 border-purple-300',
-  leader: 'bg-accent-300/30 text-accent-700 border-accent-400',
-  follower: 'bg-accent-300/30 text-accent-700 border-accent-400',
-  both: 'bg-primary-100 text-primary-700 border-primary-300',
+  beginner: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-300 dark:border-green-700',
+  intermediate: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-700',
+  advanced: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-purple-300 dark:border-purple-700',
+  leader: 'bg-accent-300/30 dark:bg-accent-900/30 text-accent-700 dark:text-accent-400 border-accent-400 dark:border-accent-700',
+  follower: 'bg-accent-300/30 dark:bg-accent-900/30 text-accent-700 dark:text-accent-400 border-accent-400 dark:border-accent-700',
+  both: 'bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-400 border-primary-300 dark:border-primary-700',
 };
 
 interface ProfileMenuSection {
@@ -47,13 +50,13 @@ export default function ProfilePage() {
   // so visitors can still see the page structure
   if (!isAuthenticated || !user) {
     return (
-      <main className="min-h-screen bg-warm-50 flex items-center justify-center p-6">
+      <main className="min-h-screen bg-warm-50 dark:bg-[#1A1410] flex items-center justify-center p-6">
         <div className="card max-w-sm w-full p-8 text-center space-y-4">
-          <div className="w-20 h-20 rounded-full bg-primary-100 flex items-center justify-center mx-auto">
+          <div className="w-20 h-20 rounded-full bg-primary-100 dark:bg-primary-900/50 flex items-center justify-center mx-auto">
             <FaUser size={32} className="text-primary-700" />
           </div>
-          <h1 className="text-xl font-bold text-warm-950">Join the Tango Community</h1>
-          <p className="text-warm-500 text-sm">
+          <h1 className="text-xl font-bold text-warm-950 dark:text-warm-100">Join the Tango Community</h1>
+          <p className="text-warm-500 dark:text-warm-400 text-sm">
             Sign in to manage your bookmarks, posts, and notifications.
           </p>
           <div className="flex flex-col gap-3 pt-2">
@@ -69,16 +72,25 @@ export default function ProfilePage() {
     );
   }
 
-  const flag = user.countryCode ? countryCodeToFlag(user.countryCode) : '';
   const initials = getInitials(user.nickname);
   const levelColorClass =
     DANCE_LEVEL_COLORS[user.danceLevel?.toLowerCase() ?? ''] ??
-    'bg-warm-100 text-warm-600 border-warm-300';
+    'bg-warm-100 dark:bg-warm-800 text-warm-600 dark:text-warm-400 border-warm-300 dark:border-warm-700';
 
   const menuSections: ProfileMenuSection[] = [
     {
       title: 'My Content',
       items: [
+        {
+          label: 'My Events',
+          href: '/profile/events',
+          icon: <FaCalendarAlt size={15} className="text-primary-600" />,
+        },
+        {
+          label: 'My Registrations',
+          href: '/profile/registrations',
+          icon: <FaClipboardList size={15} className="text-primary-600" />,
+        },
         {
           label: 'My Bookmarks',
           href: '/profile/bookmarks',
@@ -118,9 +130,9 @@ export default function ProfilePage() {
   ];
 
   return (
-    <main className="min-h-screen bg-warm-50">
+    <main className="min-h-screen bg-warm-50 dark:bg-[#1A1410]">
       {/* Profile header card */}
-      <div className="bg-white border-b border-warm-100">
+      <div className="bg-white dark:bg-warm-900 border-b border-warm-100 dark:border-warm-800">
         <div className="page-container py-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
             {/* Avatar */}
@@ -143,15 +155,13 @@ export default function ProfilePage() {
             {/* Info */}
             <div className="flex flex-col items-center sm:items-start gap-1.5">
               <div className="flex items-center gap-2 flex-wrap justify-center sm:justify-start">
-                <h1 className="text-2xl font-bold text-warm-950">{user.nickname}</h1>
-                {flag && (
-                  <span className="text-2xl leading-none" aria-label={user.countryCode}>
-                    {flag}
-                  </span>
+                <h1 className="text-2xl font-bold text-warm-950 dark:text-warm-100">{user.nickname}</h1>
+                {user.countryCode && (
+                  <CountryFlag code={user.countryCode} size={24} />
                 )}
               </div>
 
-              <p className="text-warm-500 text-sm">{user.email}</p>
+              <p className="text-warm-500 dark:text-warm-400 text-sm">{user.email}</p>
 
               {user.danceLevel && (
                 <span
@@ -169,21 +179,21 @@ export default function ProfilePage() {
       <div className="page-container py-6 max-w-2xl space-y-5">
         {menuSections.map((section) => (
           <section key={section.title}>
-            <h2 className="text-xs font-semibold text-warm-400 uppercase tracking-wider mb-2 px-1">
+            <h2 className="text-xs font-semibold text-warm-400 dark:text-warm-500 uppercase tracking-wider mb-2 px-1">
               {section.title}
             </h2>
-            <div className="card divide-y divide-warm-100">
+            <div className="card divide-y divide-warm-100 dark:divide-warm-800">
               {section.items.map((item) => {
                 const commonClasses = `flex items-center gap-3 px-5 py-4 w-full text-left
-                  hover:bg-warm-50 transition-colors
-                  ${item.danger ? 'text-primary-700' : 'text-warm-800'}`;
+                  hover:bg-warm-50 dark:hover:bg-warm-800 transition-colors
+                  ${item.danger ? 'text-primary-700 dark:text-primary-400' : 'text-warm-800 dark:text-warm-200'}`;
 
                 if (item.href) {
                   return (
                     <Link key={item.label} href={item.href} className={commonClasses}>
                       {item.icon}
                       <span className="flex-1 font-medium">{item.label}</span>
-                      <FaChevronRight size={12} className="text-warm-300" />
+                      <FaChevronRight size={12} className="text-warm-300 dark:text-warm-600" />
                     </Link>
                   );
                 }
@@ -197,7 +207,7 @@ export default function ProfilePage() {
                   >
                     {item.icon}
                     <span className="flex-1 font-medium">{item.label}</span>
-                    {!item.danger && <FaChevronRight size={12} className="text-warm-300" />}
+                    {!item.danger && <FaChevronRight size={12} className="text-warm-300 dark:text-warm-600" />}
                   </button>
                 );
               })}

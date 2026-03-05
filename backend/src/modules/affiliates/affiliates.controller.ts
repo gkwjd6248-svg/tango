@@ -54,11 +54,13 @@ export class AffiliatesController {
     @Query('category') category?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
+    @Query('country') targetCountry?: string,
   ) {
     return this.productsService.getDeals(
       category,
       page ? parseInt(page, 10) : undefined,
       limit ? parseInt(limit, 10) : undefined,
+      targetCountry,
     );
   }
 }

@@ -44,5 +44,8 @@ export const config = {
     aliexpress: {
       trackingId: process.env.ALIEXPRESS_TRACKING_ID || '',
     },
+    temu: {
+      trackingId: process.env.TEMU_TRACKING_ID || '',
+    },
   },
 } as const;

@@ -18,6 +18,29 @@ const pool = new Pool({
 });
 
 /**
+ * Derive target_country from the product's affiliate_provider and language.
+ * - amazon  → 'US'
+ * - coupang → 'KR'
+ * - temu    → use target_country from product if set, otherwise null
+ * - aliexpress → null (global)
+ */
+function deriveTargetCountry(product: ExtractedProduct): string | null {
+  if (product.target_country) return product.target_country;
+  switch (product.affiliate_provider) {
+    case 'amazon':
+      return 'US';
+    case 'coupang':
+      return 'KR';
+    case 'temu':
+      // If no explicit target_country, default to 'US' for temu
+      return 'US';
+    case 'aliexpress':
+    default:
+      return null;
+  }
+}
+
+/**
  * Inserts a new product deal or updates an existing one.
  *
  * Dedup key: affiliate_url — if the same affiliate URL is encountered again the
@@ -30,6 +53,7 @@ export async function upsertProductDeal(
 ): Promise<'created' | 'updated'> {
   // affiliate_url must be present at this point (set by buildAffiliateUrl in the extractor)
   const affiliateUrl = product.affiliate_url ?? product.source_url;
+  const targetCountry = deriveTargetCountry(product);
 
   const client: PoolClient = await pool.connect();
   try {
@@ -50,8 +74,9 @@ export async function upsertProductDeal(
           image_urls          = $7,
           is_active           = TRUE,
           expires_at          = $8,
+          target_country      = $9,
           updated_at          = NOW()
-         WHERE id = $9`,
+         WHERE id = $10`,
         [
           product.title,
           product.description ?? null,
@@ -61,6 +86,7 @@ export async function upsertProductDeal(
           product.currency,
           JSON.stringify(product.image_urls ?? []),
           product.expires_at ?? null,
+          targetCountry,
           existing.rows[0].id,
         ],
       );
@@ -73,8 +99,8 @@ export async function upsertProductDeal(
         title, description, product_category,
         original_price, deal_price, currency,
         affiliate_provider, affiliate_url, affiliate_id,
-        image_urls, is_active, expires_at
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,TRUE,$11)`,
+        image_urls, is_active, expires_at, target_country
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,TRUE,$11,$12)`,
       [
         product.title,
         product.description ?? null,
@@ -87,6 +113,7 @@ export async function upsertProductDeal(
         product.affiliate_id ?? null,
         JSON.stringify(product.image_urls ?? []),
         product.expires_at ?? null,
+        targetCountry,
       ],
     );
     logger.info({ title: product.title, provider: product.affiliate_provider }, 'New product deal created');

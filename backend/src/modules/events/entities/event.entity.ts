@@ -46,8 +46,14 @@ export class TangoEvent {
   @Column({ name: 'source_url', nullable: true })
   sourceUrl: string;
 
+  @Column({ name: 'website_url', nullable: true })
+  websiteUrl: string;
+
   @Column({ name: 'organizer_name', nullable: true })
   organizerName: string;
+
+  @Column({ name: 'organizer_contact', nullable: true })
+  organizerContact: string;
 
   @Column({ name: 'price_info', nullable: true })
   priceInfo: string;
@@ -58,11 +64,23 @@ export class TangoEvent {
   @Column({ name: 'image_urls', type: 'jsonb', nullable: true })
   imageUrls: string[];
 
+  @Column({ name: 'max_participants', type: 'int', nullable: true })
+  maxParticipants: number;
+
+  @Column({ name: 'registration_deadline', type: 'timestamptz', nullable: true })
+  registrationDeadline: Date;
+
   @Column({ name: 'is_verified', default: false })
   isVerified: boolean;
 
   @Column({ default: 'active' })
   status: string;
+
+  @Column({ default: 'user' })
+  source: string;
+
+  @Column({ name: 'created_by', nullable: true })
+  createdBy: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

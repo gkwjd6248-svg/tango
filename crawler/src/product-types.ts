@@ -18,7 +18,7 @@ export const ExtractedProductSchema = z.object({
   currency: z.string().length(3).default('USD'),
 
   // Provider must match the product_deals CHECK constraint
-  affiliate_provider: z.enum(['coupang', 'amazon', 'aliexpress']),
+  affiliate_provider: z.enum(['coupang', 'amazon', 'aliexpress', 'temu']),
 
   // The canonical product page URL — used as the dedup key before affiliate wrapping
   source_url: z.string().url(),
@@ -33,6 +33,9 @@ export const ExtractedProductSchema = z.object({
 
   // ISO 8601 datetime string; null means the deal has no expiry
   expires_at: z.string().nullable().optional(),
+
+  // Two-letter country code for geographic targeting; null = global
+  target_country: z.string().length(2).nullable().optional(),
 
   // Extraction confidence: 1.0 = all fields clear, 0.5 = some inference
   confidence: z.number().min(0).max(1).default(0.5),
@@ -71,12 +74,14 @@ export interface ProductCrawlSource {
   name: string;
   base_url: string;
   // Which affiliate provider does this source belong to
-  affiliate_provider: 'coupang' | 'amazon' | 'aliexpress';
+  affiliate_provider: 'coupang' | 'amazon' | 'aliexpress' | 'temu';
   // Tango product category this source targets
   product_category: 'shoes' | 'clothing' | 'accessories' | 'music' | 'other';
   crawl_frequency: 'hourly' | 'daily' | 'weekly' | 'monthly';
   is_active: boolean;
   parser_config: ProductParserConfig;
+  // Two-letter country code for geographic targeting; undefined = derive from provider
+  target_country?: string;
 }
 
 // ----------------------------------------------------------------

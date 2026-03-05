@@ -18,6 +18,12 @@ interface AuthState {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (data: { email: string; password: string; nickname: string; countryCode: string }) => Promise<void>;
+  socialLogin: (data: {
+    provider: 'google' | 'kakao' | 'naver' | 'apple';
+    token: string;
+    nickname?: string;
+    countryCode?: string;
+  }) => Promise<{ isNewUser?: boolean }>;
   logout: () => Promise<void>;
   loadToken: () => Promise<void>;
 }
@@ -38,6 +44,13 @@ export const useAuthStore = create<AuthState>((set) => ({
     const response = await authApi.register(data);
     await SecureStore.setItemAsync('token', response.token);
     set({ user: response.user, token: response.token, isAuthenticated: true });
+  },
+
+  socialLogin: async (data) => {
+    const response = await authApi.socialLogin(data);
+    await SecureStore.setItemAsync('token', response.token);
+    set({ user: response.user, token: response.token, isAuthenticated: true });
+    return { isNewUser: response.isNewUser };
   },
 
   logout: async () => {

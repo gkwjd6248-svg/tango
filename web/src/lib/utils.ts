@@ -48,16 +48,19 @@ export function formatRelativeTime(dateStr: string): string {
 /**
  * Formats an ISO date string to a locale-friendly display string.
  * E.g. "Saturday, March 15, 2025 · 9:00 PM"
+ * @param dateStr - ISO 8601 date string
+ * @param locale - Optional BCP 47 locale tag (e.g. 'en', 'ko', 'es'). Defaults to browser locale.
  */
-export function formatDate(dateStr: string): string {
+export function formatDate(dateStr: string, locale?: string): string {
   const date = new Date(dateStr);
-  const dateFormatted = date.toLocaleDateString(undefined, {
+  const localeStr = locale || undefined;
+  const dateFormatted = date.toLocaleDateString(localeStr, {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
-  const timeFormatted = date.toLocaleTimeString([], {
+  const timeFormatted = date.toLocaleTimeString(localeStr, {
     hour: '2-digit',
     minute: '2-digit',
   });
@@ -67,15 +70,18 @@ export function formatDate(dateStr: string): string {
 /**
  * Formats a short date for use in list cards.
  * E.g. "Mar 15, 2025 · 9:00 PM"
+ * @param dateStr - ISO 8601 date string
+ * @param locale - Optional BCP 47 locale tag (e.g. 'en', 'ko', 'es'). Defaults to browser locale.
  */
-export function formatDateShort(dateStr: string): string {
+export function formatDateShort(dateStr: string, locale?: string): string {
   const date = new Date(dateStr);
-  const dateFormatted = date.toLocaleDateString(undefined, {
+  const localeStr = locale || undefined;
+  const dateFormatted = date.toLocaleDateString(localeStr, {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
   });
-  const timeFormatted = date.toLocaleTimeString([], {
+  const timeFormatted = date.toLocaleTimeString(localeStr, {
     hour: '2-digit',
     minute: '2-digit',
   });

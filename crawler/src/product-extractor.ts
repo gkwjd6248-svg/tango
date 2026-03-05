@@ -113,7 +113,7 @@ export async function extractProducts(
  */
 export function buildAffiliateUrl(
   sourceUrl: string,
-  provider: 'amazon' | 'coupang' | 'aliexpress',
+  provider: 'amazon' | 'coupang' | 'aliexpress' | 'temu',
 ): string {
   try {
     switch (provider) {
@@ -123,6 +123,8 @@ export function buildAffiliateUrl(
         return buildCoupangAffiliateUrl(sourceUrl);
       case 'aliexpress':
         return buildAliexpressAffiliateUrl(sourceUrl);
+      case 'temu':
+        return buildTemuAffiliateUrl(sourceUrl);
       default: {
         // Exhaustiveness guard — TypeScript should prevent reaching here
         const _exhaustive: never = provider;
@@ -175,11 +177,23 @@ function buildAliexpressAffiliateUrl(sourceUrl: string): string {
   return `${redirectBase}?${params.toString()}`;
 }
 
+function buildTemuAffiliateUrl(sourceUrl: string): string {
+  const { trackingId } = config.affiliate.temu;
+
+  // Temu affiliate links use a simple query parameter for tracking
+  const url = new URL(sourceUrl);
+  if (trackingId) {
+    url.searchParams.set('_x_sessn_id', trackingId);
+  }
+  url.searchParams.set('utm_source', 'tango_community');
+  return url.toString();
+}
+
 /**
  * Returns the configured affiliate partner identifier for a given provider.
  * This is stored in the affiliate_id column for reporting purposes.
  */
-function getAffiliateId(provider: 'amazon' | 'coupang' | 'aliexpress'): string {
+function getAffiliateId(provider: 'amazon' | 'coupang' | 'aliexpress' | 'temu'): string {
   switch (provider) {
     case 'amazon':
       return config.affiliate.amazon.associateTag;
@@ -187,6 +201,8 @@ function getAffiliateId(provider: 'amazon' | 'coupang' | 'aliexpress'): string {
       return config.affiliate.coupang.partnerId || config.affiliate.coupang.subId;
     case 'aliexpress':
       return config.affiliate.aliexpress.trackingId;
+    case 'temu':
+      return config.affiliate.temu.trackingId;
     default: {
       const _exhaustive: never = provider;
       return '';

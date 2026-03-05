@@ -16,17 +16,23 @@ interface I18nState {
   setLocale: (locale: Locale) => void;
 }
 
+const detectedLocale = typeof navigator !== 'undefined'
+  ? (navigator.language.toLowerCase().startsWith('ko') ? 'ko' as Locale
+    : navigator.language.toLowerCase().startsWith('es') ? 'es' as Locale
+    : 'en' as Locale)
+  : 'en' as Locale;
+
 export const useI18nStore = create<I18nState>()(
   persist(
     (set) => ({
-      locale: 'en',
-      t: en,
+      locale: detectedLocale,
+      t: localeMap[detectedLocale],
       setLocale: (locale: Locale) => {
         set({ locale, t: localeMap[locale] });
       },
     }),
     {
-      name: 'tango-locale',
+      name: 'tango-locale-v2',
       partialize: (state) => ({ locale: state.locale }),
       onRehydrateStorage: () => (state) => {
         if (state) {

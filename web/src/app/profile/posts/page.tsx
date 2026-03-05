@@ -60,18 +60,18 @@ function MyPostsContent() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-warm-50">
+    <main className="min-h-screen bg-warm-50 dark:bg-[#1A1410]">
       {/* Page header */}
-      <div className="bg-white border-b border-warm-100 sticky top-0 z-20">
+      <div className="bg-white dark:bg-warm-900 border-b border-warm-100 dark:border-warm-800 sticky top-0 z-20">
         <div className="page-container py-4 flex items-center gap-3">
           <Link
             href="/profile"
-            className="p-2 rounded-lg text-warm-500 hover:text-warm-950 hover:bg-warm-100 transition-colors"
+            className="p-2 rounded-lg text-warm-500 hover:text-warm-950 dark:hover:text-warm-100 hover:bg-warm-100 dark:hover:bg-warm-800 transition-colors"
             aria-label="Back to profile"
           >
             <FaArrowLeft size={16} />
           </Link>
-          <h1 className="text-lg font-bold text-warm-950">My Posts</h1>
+          <h1 className="text-lg font-bold text-warm-950 dark:text-warm-100">My Posts</h1>
         </div>
       </div>
 
@@ -88,7 +88,7 @@ function MyPostsContent() {
         {/* Error state */}
         {error && posts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <p className="text-primary-700 font-semibold text-lg mb-4">{error}</p>
+            <p className="text-primary-700 dark:text-primary-400 font-semibold text-lg mb-4">{error}</p>
             <button onClick={() => loadPosts(true)} className="btn-primary">
               Retry
             </button>
@@ -98,8 +98,8 @@ function MyPostsContent() {
         {/* Empty state */}
         {!isLoading && !error && posts.length === 0 && (
           <div className="flex flex-col items-center justify-center py-24 text-center">
-            <FaFileAlt size={48} className="text-warm-200 mb-4" />
-            <p className="text-warm-600 font-semibold text-lg">You haven&apos;t posted anything yet</p>
+            <FaFileAlt size={48} className="text-warm-200 dark:text-warm-700 mb-4" />
+            <p className="text-warm-600 dark:text-warm-400 font-semibold text-lg">You haven&apos;t posted anything yet</p>
             <p className="text-warm-400 text-sm mt-2">
               Share your tango experiences with the community.
             </p>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useTranslation } from '@/lib/i18n';
+import { SocialLoginButtons } from '@/components/auth/SocialLoginButtons';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-warm-50 px-4 py-16">
+    <div className="min-h-screen flex items-center justify-center bg-warm-50 dark:bg-[#1A1410] px-4 py-16">
       <div className="w-full max-w-md">
         {/* Card */}
         <div className="card p-8">
@@ -63,15 +64,15 @@ export default function LoginPage() {
                 Tango
               </span>
             </Link>
-            <h1 className="text-2xl font-bold text-warm-950">{t.auth.loginTitle}</h1>
-            <p className="text-warm-500 text-sm mt-1">{t.auth.loginSubtitle}</p>
+            <h1 className="text-2xl font-bold text-warm-950 dark:text-warm-100">{t.auth.loginTitle}</h1>
+            <p className="text-warm-500 dark:text-warm-400 text-sm mt-1">{t.auth.loginSubtitle}</p>
           </div>
 
           {/* Error alert */}
           {error && (
             <div
               role="alert"
-              className="mb-5 px-4 py-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm"
+              className="mb-5 px-4 py-3 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm"
             >
               {error}
             </div>
@@ -80,7 +81,7 @@ export default function LoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-warm-800 mb-1.5">
+              <label htmlFor="email" className="block text-sm font-medium text-warm-800 dark:text-warm-200 mb-1.5">
                 {t.auth.email}
               </label>
               <input
@@ -98,7 +99,7 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-warm-800 mb-1.5">
+              <label htmlFor="password" className="block text-sm font-medium text-warm-800 dark:text-warm-200 mb-1.5">
                 {t.auth.password}
               </label>
               <input
@@ -113,6 +114,15 @@ export default function LoginPage() {
                 required
                 aria-required="true"
               />
+            </div>
+
+            <div className="flex justify-end">
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm text-primary-700 dark:text-primary-400 hover:text-primary-600 dark:hover:text-primary-300 font-medium transition-colors"
+              >
+                {t.auth.forgotPassword}
+              </Link>
             </div>
 
             <button
@@ -134,12 +144,15 @@ export default function LoginPage() {
             </button>
           </form>
 
+          {/* Social Login */}
+          <SocialLoginButtons onError={(msg) => setError(msg)} />
+
           {/* Register link */}
-          <p className="mt-6 text-center text-sm text-warm-500">
+          <p className="mt-6 text-center text-sm text-warm-500 dark:text-warm-400">
             {t.auth.noAccount}{' '}
             <Link
               href="/auth/register"
-              className="text-primary-700 font-medium hover:text-primary-600 transition-colors"
+              className="text-primary-700 dark:text-primary-400 font-medium hover:text-primary-600 dark:hover:text-primary-300 transition-colors"
             >
               {t.auth.registerLink}
             </Link>
@@ -148,7 +161,7 @@ export default function LoginPage() {
 
         {/* Back to home */}
         <p className="text-center mt-4">
-          <Link href="/" className="text-xs text-warm-400 hover:text-warm-600 transition-colors">
+          <Link href="/" className="text-xs text-warm-400 dark:text-warm-500 hover:text-warm-600 dark:hover:text-warm-400 transition-colors">
             Back to home
           </Link>
         </p>

@@ -53,6 +53,9 @@ export class ProductDeal {
   @Column({ name: 'image_urls', type: 'jsonb', nullable: true, default: '[]' })
   imageUrls: string[];
 
+  @Column({ name: 'target_country', length: 2, nullable: true })
+  targetCountry: string;
+
   @Column({ name: 'is_active', default: true })
   isActive: boolean;
 

@@ -1,9 +1,10 @@
 import {
   Entity, PrimaryGeneratedColumn, Column, CreateDateColumn,
-  UpdateDateColumn, DeleteDateColumn,
+  UpdateDateColumn, DeleteDateColumn, Index,
 } from 'typeorm';
 
 @Entity('users')
+@Index(['authProvider', 'authProviderId'], { unique: true, where: '"auth_provider_id" IS NOT NULL' })
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;

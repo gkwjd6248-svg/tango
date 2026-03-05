@@ -7,6 +7,7 @@ export interface User {
   countryCode?: string;
   danceLevel?: string;
   avatarUrl?: string;
+  isAdmin?: boolean;
 }
 
 export interface AuthResponse {
@@ -27,6 +28,19 @@ export const authApi = {
     countryCode: string;
   }): Promise<AuthResponse> => {
     const response = await apiClient.post<AuthResponse>('/auth/register', data);
+    return response.data;
+  },
+
+  socialLogin: async (data: {
+    provider: 'google' | 'kakao' | 'naver' | 'apple';
+    token: string;
+    nickname?: string;
+    countryCode?: string;
+  }): Promise<AuthResponse & { isNewUser?: boolean }> => {
+    const response = await apiClient.post<AuthResponse & { isNewUser?: boolean }>(
+      '/auth/social',
+      data,
+    );
     return response.data;
   },
 

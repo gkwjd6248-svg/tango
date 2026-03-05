@@ -11,8 +11,14 @@ import {
   HiOutlineLogout,
   HiOutlineBookmark,
   HiOutlineChevronDown,
+  HiOutlineCalendar,
+  HiOutlineClipboardList,
+  HiOutlineChatAlt2,
+  HiOutlineSun,
+  HiOutlineMoon,
 } from 'react-icons/hi';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useThemeStore } from '@/store/useThemeStore';
 import { notificationsApi, Notification } from '@/lib/api/notifications';
 import { useTranslation } from '@/lib/i18n';
 import { LocaleSwitcher } from '@/components/ui/LocaleSwitcher';
@@ -29,6 +35,7 @@ export function Header() {
   const router = useRouter();
   const { t } = useTranslation();
   const { isAuthenticated, user, logout } = useAuthStore();
+  const { theme, toggleTheme } = useThemeStore();
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -39,6 +46,13 @@ export function Header() {
 
   const userMenuRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
+
+  // Determine if dark mode is currently active
+  const isDark =
+    theme === 'dark' ||
+    (theme === 'system' &&
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches);
 
   // Fetch unread count when authenticated
   useEffect(() => {
@@ -102,7 +116,7 @@ export function Header() {
     pathname === href || pathname.startsWith(href + '/');
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-primary-700 shadow-md">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-primary-700 dark:bg-primary-900 shadow-md transition-colors">
       <div className="page-container">
         <div className="flex items-center justify-between h-16">
 
@@ -131,11 +145,62 @@ export function Header() {
                 {t.nav[labelKey]}
               </Link>
             ))}
+
+            {isAuthenticated && (
+              <>
+                <div className="w-px h-5 bg-white/20 mx-1" aria-hidden="true" />
+                <Link
+                  href="/profile/events"
+                  className={clsx(
+                    'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+                    isActive('/profile/events')
+                      ? 'bg-white/20 text-white'
+                      : 'text-red-100 hover:bg-white/10 hover:text-white',
+                  )}
+                >
+                  <HiOutlineCalendar className="w-4 h-4" />
+                  {t.events.myEvents}
+                </Link>
+                <Link
+                  href="/profile/registrations"
+                  className={clsx(
+                    'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+                    isActive('/profile/registrations')
+                      ? 'bg-white/20 text-white'
+                      : 'text-red-100 hover:bg-white/10 hover:text-white',
+                  )}
+                >
+                  <HiOutlineClipboardList className="w-4 h-4" />
+                  {t.events.myRegistrations}
+                </Link>
+                <Link
+                  href="/chat"
+                  className={clsx(
+                    'flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-150',
+                    isActive('/chat')
+                      ? 'bg-white/20 text-white'
+                      : 'text-red-100 hover:bg-white/10 hover:text-white',
+                  )}
+                >
+                  <HiOutlineChatAlt2 className="w-4 h-4" />
+                  {t.nav.partyChat}
+                </Link>
+              </>
+            )}
           </nav>
 
           {/* Desktop Right Section */}
           <div className="hidden md:flex items-center gap-2">
             <LocaleSwitcher />
+
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-red-100 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? <HiOutlineSun className="w-5 h-5" /> : <HiOutlineMoon className="w-5 h-5" />}
+            </button>
 
             {isAuthenticated ? (
               <>
@@ -156,9 +221,9 @@ export function Header() {
 
                   {/* Notification Dropdown */}
                   {notifOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-warm-100 overflow-hidden animate-slide-down">
-                      <div className="px-4 py-3 border-b border-warm-100 flex items-center justify-between">
-                        <h3 className="font-semibold text-sm text-warm-950">
+                    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-warm-900 rounded-xl shadow-xl border border-warm-100 dark:border-warm-800 overflow-hidden animate-slide-down">
+                      <div className="px-4 py-3 border-b border-warm-100 dark:border-warm-800 flex items-center justify-between">
+                        <h3 className="font-semibold text-sm text-warm-950 dark:text-warm-100">
                           {t.nav.notifications}
                         </h3>
                       </div>
@@ -176,12 +241,12 @@ export function Header() {
                             <div
                               key={n.id}
                               className={clsx(
-                                'px-4 py-3 border-b border-warm-50 last:border-0',
-                                !n.isRead && 'bg-primary-50/40',
+                                'px-4 py-3 border-b border-warm-50 dark:border-warm-800 last:border-0',
+                                !n.isRead && 'bg-primary-50/40 dark:bg-primary-900/40',
                               )}
                             >
-                              <p className="text-sm font-medium text-warm-900">{n.title}</p>
-                              <p className="text-xs text-warm-500 mt-0.5">{n.body}</p>
+                              <p className="text-sm font-medium text-warm-900 dark:text-warm-100">{n.title}</p>
+                              <p className="text-xs text-warm-500 dark:text-warm-400 mt-0.5">{n.body}</p>
                             </div>
                           ))
                         )}
@@ -207,25 +272,25 @@ export function Header() {
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-warm-100 overflow-hidden animate-slide-down">
+                    <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-warm-900 rounded-xl shadow-xl border border-warm-100 dark:border-warm-800 overflow-hidden animate-slide-down">
                       <Link
                         href="/profile"
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-warm-800 hover:bg-warm-50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-warm-800 dark:text-warm-200 hover:bg-warm-50 dark:hover:bg-warm-800 transition-colors"
                       >
                         <HiOutlineUser className="w-4 h-4" />
                         {t.nav.profile}
                       </Link>
                       <Link
                         href="/bookmarks"
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-warm-800 hover:bg-warm-50 transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-warm-800 dark:text-warm-200 hover:bg-warm-50 dark:hover:bg-warm-800 transition-colors"
                       >
                         <HiOutlineBookmark className="w-4 h-4" />
                         {t.nav.bookmarks}
                       </Link>
-                      <hr className="border-warm-100" />
+                      <hr className="border-warm-100 dark:border-warm-800" />
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors"
                       >
                         <HiOutlineLogout className="w-4 h-4" />
                         {t.nav.logout}
@@ -246,21 +311,33 @@ export function Header() {
             )}
           </div>
 
-          {/* Mobile Menu Toggle */}
-          <button
-            className="md:hidden p-2 rounded-lg text-red-100 hover:text-white hover:bg-white/10 transition-all"
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label="Toggle menu"
-            aria-expanded={mobileOpen}
-          >
-            {mobileOpen ? <HiOutlineX className="w-6 h-6" /> : <HiOutlineMenu className="w-6 h-6" />}
-          </button>
+          {/* Mobile Right Section */}
+          <div className="flex md:hidden items-center gap-1">
+            {/* Theme Toggle (Mobile) */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 text-red-100 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDark ? <HiOutlineSun className="w-5 h-5" /> : <HiOutlineMoon className="w-5 h-5" />}
+            </button>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="p-2 rounded-lg text-red-100 hover:text-white hover:bg-white/10 transition-all"
+              onClick={() => setMobileOpen((v) => !v)}
+              aria-label="Toggle menu"
+              aria-expanded={mobileOpen}
+            >
+              {mobileOpen ? <HiOutlineX className="w-6 h-6" /> : <HiOutlineMenu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="md:hidden bg-primary-800 border-t border-primary-600 animate-slide-down">
+        <div className="md:hidden bg-primary-800 dark:bg-primary-950 border-t border-primary-600 dark:border-primary-800 animate-slide-down">
           <nav className="page-container py-3 space-y-1" aria-label="Mobile navigation">
             {NAV_LINKS.map(({ href, labelKey }) => (
               <Link
@@ -277,19 +354,34 @@ export function Header() {
               </Link>
             ))}
 
-            <div className="pt-3 border-t border-primary-600 mt-2">
+            <div className="pt-3 border-t border-primary-600 dark:border-primary-800 mt-2">
               {isAuthenticated ? (
                 <>
-                  <Link href="/profile" className="block px-4 py-2.5 text-sm text-red-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                  <Link href="/profile/events" className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                    <HiOutlineCalendar className="w-4 h-4" />
+                    {t.events.myEvents}
+                  </Link>
+                  <Link href="/profile/registrations" className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                    <HiOutlineClipboardList className="w-4 h-4" />
+                    {t.events.myRegistrations}
+                  </Link>
+                  <Link href="/chat" className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                    <HiOutlineChatAlt2 className="w-4 h-4" />
+                    {t.nav.partyChat}
+                  </Link>
+                  <Link href="/profile" className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                    <HiOutlineUser className="w-4 h-4" />
                     {t.nav.profile}
                   </Link>
-                  <Link href="/bookmarks" className="block px-4 py-2.5 text-sm text-red-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                  <Link href="/bookmarks" className="flex items-center gap-2 px-4 py-2.5 text-sm text-red-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+                    <HiOutlineBookmark className="w-4 h-4" />
                     {t.nav.bookmarks}
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2.5 text-sm text-red-300 hover:text-red-100 hover:bg-white/10 rounded-lg transition-colors"
+                    className="w-full text-left flex items-center gap-2 px-4 py-2.5 text-sm text-red-300 hover:text-red-100 hover:bg-white/10 rounded-lg transition-colors"
                   >
+                    <HiOutlineLogout className="w-4 h-4" />
                     {t.nav.logout}
                   </button>
                 </>

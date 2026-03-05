@@ -99,14 +99,14 @@ export default function CommunityPage() {
   const hasMore = page < totalPages;
 
   return (
-    <main className="min-h-screen bg-warm-50">
+    <main className="min-h-screen bg-warm-50 dark:bg-[#1A1410]">
       {/* Page header */}
-      <div className="bg-white border-b border-warm-100">
+      <div className="bg-white dark:bg-warm-900 border-b border-warm-100 dark:border-warm-800">
         <div className="page-container py-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-warm-950">{t.community.title}</h1>
-              <p className="text-warm-500 text-sm mt-0.5">{t.community.subtitle}</p>
+              <h1 className="text-2xl font-bold text-warm-950 dark:text-warm-100">{t.community.title}</h1>
+              <p className="text-warm-500 dark:text-warm-400 text-sm mt-0.5">{t.community.subtitle}</p>
             </div>
 
             {isAuthenticated && (
@@ -145,7 +145,7 @@ export default function CommunityPage() {
                   'flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-colors',
                   (countryScope ?? '') === code
                     ? 'bg-primary-700 text-white'
-                    : 'bg-warm-100 text-warm-600 hover:bg-warm-200',
+                    : 'bg-warm-100 dark:bg-warm-800 text-warm-600 dark:text-warm-400 hover:bg-warm-200 dark:hover:bg-warm-700',
                 )}
                 aria-pressed={(countryScope ?? '') === code}
               >
@@ -158,7 +158,7 @@ export default function CommunityPage() {
 
       {/* Compose box */}
       {showCompose && isAuthenticated && (
-        <div className="bg-white border-b border-warm-100 shadow-sm">
+        <div className="bg-white dark:bg-warm-900 border-b border-warm-100 dark:border-warm-800 shadow-sm">
           <div className="page-container py-4 max-w-2xl">
             <form onSubmit={handleSubmitPost} className="space-y-3">
               {/* Post type selector */}
@@ -172,7 +172,7 @@ export default function CommunityPage() {
                       'px-3 py-1 rounded-full text-xs font-medium transition-colors',
                       postType === value
                         ? 'bg-primary-700 text-white'
-                        : 'bg-warm-100 text-warm-600 hover:bg-warm-200',
+                        : 'bg-warm-100 dark:bg-warm-800 text-warm-600 dark:text-warm-400 hover:bg-warm-200 dark:hover:bg-warm-700',
                     )}
                   >
                     {label}
@@ -193,7 +193,7 @@ export default function CommunityPage() {
               />
 
               {submitError && (
-                <p role="alert" className="text-sm text-red-600">
+                <p role="alert" className="text-sm text-red-600 dark:text-red-400">
                   {submitError}
                 </p>
               )}
@@ -210,7 +210,7 @@ export default function CommunityPage() {
                       setPostText('');
                       setSubmitError(null);
                     }}
-                    className="btn-ghost text-warm-600"
+                    className="btn-ghost text-warm-600 dark:text-warm-400"
                   >
                     {t.community.cancel}
                   </button>
@@ -232,8 +232,8 @@ export default function CommunityPage() {
       <div className="page-container py-6 max-w-2xl">
         {/* Not authenticated prompt */}
         {!isAuthenticated && (
-          <div className="card p-4 mb-5 flex items-center justify-between gap-4 bg-primary-50 border-primary-100">
-            <p className="text-sm text-warm-700">
+          <div className="card p-4 mb-5 flex items-center justify-between gap-4 bg-primary-50 dark:bg-primary-900/30 border-primary-100 dark:border-primary-800/50">
+            <p className="text-sm text-warm-700 dark:text-warm-300">
               Sign in to post, like, and translate community posts.
             </p>
             <a href="/auth/login" className="btn-primary flex-shrink-0 text-xs px-3 py-1.5">
@@ -254,8 +254,8 @@ export default function CommunityPage() {
         {/* Error state */}
         {!isLoading && error && posts.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-primary-700 font-semibold mb-2">{t.common.error}</p>
-            <p className="text-warm-500 text-sm mb-5">{error}</p>
+            <p className="text-primary-700 dark:text-primary-400 font-semibold mb-2">{t.common.error}</p>
+            <p className="text-warm-500 dark:text-warm-400 text-sm mb-5">{error}</p>
             <button onClick={() => fetchPosts()} className="btn-primary">
               {t.common.retry}
             </button>
@@ -265,10 +265,10 @@ export default function CommunityPage() {
         {/* Empty state */}
         {!isLoading && !error && posts.length === 0 && (
           <div className="text-center py-24">
-            <div className="w-16 h-16 rounded-full bg-warm-100 flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-warm-100 dark:bg-warm-800 flex items-center justify-center mx-auto mb-4">
               <FaGlobeAmericas size={28} className="text-warm-300" />
             </div>
-            <h2 className="text-warm-700 font-semibold text-xl mb-2">
+            <h2 className="text-warm-700 dark:text-warm-300 font-semibold text-xl mb-2">
               {t.community.noPosts}
             </h2>
             <p className="text-warm-400 text-sm">
