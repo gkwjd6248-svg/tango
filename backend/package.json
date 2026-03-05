@@ -35,14 +35,12 @@
     "pg": "^8.11.3",
     "reflect-metadata": "^0.2.1",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.19",
-    "typescript": "^5.3.3"
-  },
-  "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/multer": "^2.0.0",
     "@types/node": "^20.11.0",
-    "@types/passport-jwt": "^4.0.0"
+    "@types/passport-jwt": "^4.0.0",
+    "typeorm": "^0.3.19",
+    "typescript": "^5.3.3"
   }
 }
